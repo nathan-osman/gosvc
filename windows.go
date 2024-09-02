@@ -3,6 +3,7 @@
 package gosvc
 
 import (
+	"errors"
 	"os"
 
 	"golang.org/x/sys/windows/svc"
@@ -135,6 +136,11 @@ func (w *WindowsService) serviceCommand(cmd string) error {
 }
 
 func (w *WindowsService) Run() error {
+	if i, err := svc.IsWindowsService(); err != nil {
+		return err
+	} else if !i {
+		return errors.New("application must be run as a Windows service")
+	}
 	return svc.Run(w.Name, serviceHandlerFunc(runService))
 }
 

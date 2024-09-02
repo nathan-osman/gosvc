@@ -16,10 +16,3 @@ type Starter interface {
 	Start() error
 	Stop() error
 }
-
-// Platform is the interface that combines Runner, Installer, and Starter.
-type Platform interface {
-	Runner
-	Installer
-	Starter
-}
