@@ -12,29 +12,38 @@ And it's really easy to use!
 
 ### Usage
 
-Begin by importing the package and creating a simple config:
+Begin by importing the package:
 
 ```golang
 import "github.com/nathan-osman/gosvc"
+```
 
-cfg := gosvc.Config{
-    Name:            "myservice",
-    DisplayName:     "My Service",
-    Description:     "Does various things"
-    RequiresNetwork: true,
+#### Windows
+
+On Windows, create an instance of the `WindowsService` type:
+
+```golang
+s := &gosvc.WindowsService{
+    Name:         "myservice",
+    DisplayName:  "My Service",
+    Description:  "Does the things",
+    Args:         []string{"-c", "config.json"},
+    Dependencies: []string{"nsi"},
 }
 ```
 
-To install the application (perhaps in response to a "myapp install" invocation), simply run:
+You can then call the `Run()`, `Install()`, etc. methods directly.
+
+#### Linux
+
+On Linux, create an instance of the `SignalRunner` and `SystemdInstaller` types:
 
 ```golang
-gosvc.Install(&cfg)
+r := &gosvc.SignalRunner{}
+i := &gosvc.SystemdInstaller{
+    Name:         "myservice",
+    Description:  "My Service",
+    Args:         []string{"-c", "config.json"},
+    Dependencies: []string{"network.target"},
+}
 ```
-
-When you are ready to run the application, use:
-
-```golang
-gosvc.Run(&cfg)
-```
-
-That's it!
