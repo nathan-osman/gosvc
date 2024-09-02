@@ -21,11 +21,12 @@ const (
 // WindowsService implements the Runner, Installer, and Starter interfaces for
 // Windows services.
 type WindowsService struct {
-	Name         string
-	DisplayName  string
-	Description  string
-	Args         []string
-	Dependencies []string
+	Name                  string
+	DisplayName           string
+	Description           string
+	Args                  []string
+	Dependencies          []string
+	DoNotRunInteractively bool
 }
 
 // svc.Run() expects a Handler but we want to be able to simply pass a
@@ -136,10 +137,15 @@ func (w *WindowsService) serviceCommand(cmd string) error {
 }
 
 func (w *WindowsService) Run() error {
-	if i, err := svc.IsWindowsService(); err != nil {
+	i, err := svc.IsWindowsService()
+	if err != nil {
 		return err
-	} else if !i {
-		return errors.New("application must be run as a Windows service")
+	}
+	if !i {
+		if w.DoNotRunInteractively {
+			return errors.New("application must be run as a Windows service")
+		}
+		return (&SignalRunner{}).Run()
 	}
 	return svc.Run(w.Name, serviceHandlerFunc(runService))
 }
