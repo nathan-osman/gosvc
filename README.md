@@ -18,32 +18,34 @@ Begin by importing the package:
 import "github.com/nathan-osman/gosvc"
 ```
 
-#### Windows
-
-On Windows, create an instance of the `WindowsService` type:
+Fill in an `Application` struct:
 
 ```golang
-s := &gosvc.WindowsService{
-    Name:         "myservice",
-    DisplayName:  "My Service",
-    Description:  "Does the things",
-    Args:         []string{"-c", "config.json"},
-    Dependencies: []string{"nsi"},
+a := &gosvc.Application{
+    Name:            "myservice",
+    Description:     "My Service",
+    Args:            []string{"-c", "config.json"},
+    RequiresNetwork: true,
 }
 ```
 
-You can then call the `Run()`, `Install()`, etc. methods directly.
-
-#### Linux
-
-On Linux, create an instance of the `SignalRunner` and `SystemdInstaller` types:
+Convert this to a `Platform`:
 
 ```golang
-r := &gosvc.SignalRunner{}
-i := &gosvc.SystemdInstaller{
-    Name:         "myservice",
-    Description:  "My Service",
-    Args:         []string{"-c", "config.json"},
-    Dependencies: []string{"network.target"},
+p := a.Platform()
+```
+
+You can now use `p.Run()` in the main body of your application.
+
+You also have access to `p.Install()`, `p.Remove()`, `p.Start()`, and `p.Stop()` for controlling the service. If you are using ["github.com/urfave/cli"]("https://github.com/urfave/cli"), you can add these as commands to your application with:
+
+```golang
+app := &cli.App{
+    //...
+    Commands: gosvc.Commands(p),
 }
 ```
+
+Users of your application will be able to install the service with:
+
+    yourapp.exe install
