@@ -51,3 +51,14 @@ func StopCommand(s Starter) *cli.Command {
 		},
 	}
 }
+
+// Commands returns a list of commands suitable for use with
+// github.com/urfave/cli.
+func Commands(p Platform) []*cli.Command {
+	return []*cli.Command{
+		InstallCommand(p),
+		RemoveCommand(p),
+		StartCommand(p),
+		StopCommand(p),
+	}
+}

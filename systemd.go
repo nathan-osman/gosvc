@@ -5,6 +5,7 @@ package gosvc
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"text/template"
 )
@@ -23,22 +24,30 @@ WantedBy=default.target
 `
 )
 
-// SystemdInstaller implements the Installer interface.
-type SystemdInstaller struct {
+// SystemdService implements the Installer interface.
+type SystemdService struct {
 	Name         string
 	Description  string
 	Args         []string
 	Dependencies []string
 }
 
-func (s *SystemdInstaller) unitFileName() string {
+func (s *SystemdService) unitFileName() string {
 	return fmt.Sprintf(
 		"/lib/systemd/system/%s.service",
 		s.Name,
 	)
 }
 
-func (s *SystemdInstaller) Install() error {
+func runSystemdCommand(args ...string) error {
+	cmd := exec.Command("systemctl", args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (s *SystemdService) Install() error {
 
 	// Determine the full path to the executable
 	p, err := os.Executable()
@@ -55,7 +64,7 @@ func (s *SystemdInstaller) Install() error {
 		return err
 	}
 
-	// Attempt to open the unit file
+	// Attempt to create the unit file
 	f, err := os.Create(s.unitFileName())
 	if err != nil {
 		return err
@@ -63,9 +72,29 @@ func (s *SystemdInstaller) Install() error {
 	defer f.Close()
 
 	// Write the template
-	return t.Execute(f, s)
+	if err := t.Execute(f, s); err != nil {
+		return err
+	}
+
+	// Enable the service
+	return runSystemdCommand("enable", s.Name)
 }
 
-func (s *SystemdInstaller) Remove() error {
+func (s *SystemdService) Remove() error {
+
+	// Disable the service
+	if err := runSystemdCommand("disable", s.Name); err != nil {
+		return err
+	}
+
+	// Remove the unit file
 	return os.Remove(s.unitFileName())
+}
+
+func (s *SystemdService) Start() error {
+	return runSystemdCommand("start", s.Name)
+}
+
+func (s *SystemdService) Stop() error {
+	return runSystemdCommand("stop", s.Name)
 }
