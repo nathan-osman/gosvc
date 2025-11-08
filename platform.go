@@ -10,9 +10,19 @@ type Platform interface {
 // Application provides the information necessary to run the application on
 // the current platform.
 type Application struct {
-	Name            string
-	Description     string
-	Args            []string
+
+	// Name is the human-readable name of the service.
+	Name string
+
+	// Description is a brief description of the service and its purpose.
+	Description string
+
+	// Args indicates the command-line arguments needed to launch the
+	// application.
+	Args []string
+
+	// RequiresNetwork indicates that this application requires network access
+	// and should only be started after network services are available.
 	RequiresNetwork bool
 }
 
