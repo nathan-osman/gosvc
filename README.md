@@ -37,12 +37,14 @@ p := a.Platform()
 
 You can now use `p.Run()` in the main body of your application.
 
-You also have access to `p.Install()`, `p.Remove()`, `p.Start()`, and `p.Stop()` for controlling the service. If you are using [github.com/urfave/cli](https://github.com/urfave/cli), you can add these as commands to your application with:
+You also have access to `p.Install()`, `p.Remove()`, `p.Start()`, and `p.Stop()` for controlling the service. If you are using [github.com/urfave/cli/v2](https://github.com/urfave/cli), you can add these as commands to your application with:
 
 ```golang
+import "github.com/nathan-osman/gosvc/cli/urfavecliv2"
+
 app := &cli.App{
     //...
-    Commands: gosvc.Commands(p),
+    Commands: urfavecliv2.Commands(p),
 }
 ```
 

@@ -1,12 +1,13 @@
-package gosvc
+package urfavecliv2
 
 import (
+	"github.com/nathan-osman/gosvc"
 	"github.com/urfave/cli/v2"
 )
 
 // InstallCommand returns an "install" command suitable for use with
 // github.com/urfave/cli.
-func InstallCommand(i Installer) *cli.Command {
+func InstallCommand(i gosvc.Installer) *cli.Command {
 	return &cli.Command{
 		Name:  "install",
 		Usage: "install the application",
@@ -18,7 +19,7 @@ func InstallCommand(i Installer) *cli.Command {
 
 // RemoveCommand returns a "remove" command suitable for use with
 // github.com/urfave/cli.
-func RemoveCommand(i Installer) *cli.Command {
+func RemoveCommand(i gosvc.Installer) *cli.Command {
 	return &cli.Command{
 		Name:  "remove",
 		Usage: "remove the application",
@@ -30,7 +31,7 @@ func RemoveCommand(i Installer) *cli.Command {
 
 // StartCommand returns a "start" command suitable for use with
 // github.com/urfave/cli.
-func StartCommand(s Starter) *cli.Command {
+func StartCommand(s gosvc.Starter) *cli.Command {
 	return &cli.Command{
 		Name:  "start",
 		Usage: "starts the application",
@@ -42,7 +43,7 @@ func StartCommand(s Starter) *cli.Command {
 
 // StopCommand returns a "stop" command suitable for use with
 // github.com/urfave/cli.
-func StopCommand(s Starter) *cli.Command {
+func StopCommand(s gosvc.Starter) *cli.Command {
 	return &cli.Command{
 		Name:  "stop",
 		Usage: "stops the application",
@@ -54,7 +55,7 @@ func StopCommand(s Starter) *cli.Command {
 
 // Commands returns a list of commands suitable for use with
 // github.com/urfave/cli.
-func Commands(p Platform) []*cli.Command {
+func Commands(p gosvc.Platform) []*cli.Command {
 	return []*cli.Command{
 		InstallCommand(p),
 		RemoveCommand(p),
