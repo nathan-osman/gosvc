@@ -35,14 +35,18 @@ Convert this to a `Platform`:
 p := a.Platform()
 ```
 
-You can now use `p.Run()` in the main body of your application.
+You can now use `p.Run()` in the main body of your application. You also have access to `p.Install()`, `p.Remove()`, `p.Start()`, and `p.Stop()` for controlling the service.
 
-You also have access to `p.Install()`, `p.Remove()`, `p.Start()`, and `p.Stop()` for controlling the service. If you are using [github.com/urfave/cli/v2](https://github.com/urfave/cli), you can easily initialize your application with:
+### Using with urfave/cli/v2
+
+If you are using [github.com/urfave/cli/v2](https://github.com/urfave/cli), you can save yourself a lot of boilerplate code and initialize your application with:
 
 ```golang
 import "github.com/nathan-osman/gosvc/cli/urfavecliv2"
 
-app, err := urfavecliv2.App(a)
+a := &gosvc.Application{...}
+
+app, err := urfavecliv2.App(a, nil)
 if err != nil {
     panic(err)
 }

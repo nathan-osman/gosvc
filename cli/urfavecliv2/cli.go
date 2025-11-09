@@ -8,13 +8,32 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Config provides extra configuration information specific to urfave/cli.
+type Config struct {
+
+	// InstallFlags provides flags for the install command.
+	InstallFlags []cli.Flag
+
+	// InstallCustomizer provides a function for running custom code before
+	// the install command. This might be used for adding command-line
+	// arguments, for example.
+	InstallCustomizer func(ctx *cli.Context)
+}
+
 // InstallCommand returns an "install" command suitable for use with
 // github.com/urfave/cli.
-func InstallCommand(i gosvc.Installer) *cli.Command {
+func InstallCommand(i gosvc.Installer, cfg *Config) *cli.Command {
+	if cfg == nil {
+		cfg = &Config{}
+	}
 	return &cli.Command{
 		Name:  "install",
 		Usage: "install the application",
-		Action: func(*cli.Context) error {
+		Flags: cfg.InstallFlags,
+		Action: func(ctx *cli.Context) error {
+			if cfg.InstallCustomizer != nil {
+				cfg.InstallCustomizer(ctx)
+			}
 			return i.Install()
 		},
 	}
@@ -57,7 +76,7 @@ func StopCommand(s gosvc.Starter) *cli.Command {
 }
 
 // App returns a *cli.App initialized with the commands from Commands().
-func App(app *gosvc.Application) (*cli.App, error) {
+func App(app *gosvc.Application, cfg *Config) (*cli.App, error) {
 	e, err := os.Executable()
 	if err != nil {
 		return nil, err
@@ -67,14 +86,13 @@ func App(app *gosvc.Application) (*cli.App, error) {
 		Name:  filepath.Base(e),
 		Usage: app.Description,
 		Commands: []*cli.Command{
-			InstallCommand(p),
+			InstallCommand(p, cfg),
 			RemoveCommand(p),
 			StartCommand(p),
 			StopCommand(p),
 		},
 		Action: func(ctx *cli.Context) error {
-			p.Run()
-			return nil
+			return p.Run()
 		},
 	}, nil
 }
